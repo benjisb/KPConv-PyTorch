@@ -34,6 +34,7 @@ from datasets.S3DIS import *
 from datasets.SensatUrban import *
 from datasets.SemanticKitti import *
 from datasets.Toronto3D import *
+from datasets.LAS import *
 from torch.utils.data import DataLoader
 
 from utils.config import Config
@@ -97,10 +98,10 @@ if __name__ == '__main__':
     #       > 'last_XXX': Automatically retrieve the last trained model on dataset XXX
     #       > '(old_)results/Log_YYYY-MM-DD_HH-MM-SS': Directly provide the path of a trained model
 
-    chosen_log = 'results/Log_2024-05-14_21-04-36'
+    chosen_log = 'results/Log_2024-12-10_00-57-14'
 
     # Choose the index of the checkpoint to load OR None if you want to load the current checkpoint
-    chkp_idx = -1
+    chkp_idx = None
 
     # Choose to test on validation or test split
     on_val = True
@@ -148,7 +149,7 @@ if __name__ == '__main__':
     #config.batch_num = 3
     #config.in_radius = 4
     config.validation_size = 200
-    config.input_threads = 10
+    config.input_threads = 5
 
     ##############
     # Prepare Data
@@ -184,6 +185,10 @@ if __name__ == '__main__':
         test_dataset = SemanticKittiDataset(config, set=set, balance_classes=False)
         test_sampler = SemanticKittiSampler(test_dataset)
         collate_fn = SemanticKittiCollate
+    elif config.dataset == 'LAS':
+        test_dataset = LASDataset(config, set='validation', use_potentials=True)
+        test_sampler = LASSampler(test_dataset)
+        collate_fn = LASCollate
     else:
         raise ValueError('Unsupported dataset : ' + config.dataset)
 

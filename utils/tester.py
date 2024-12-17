@@ -23,6 +23,7 @@
 
 
 # Basic libs
+import os
 import torch
 import torch.nn as nn
 import numpy as np
@@ -198,7 +199,7 @@ class ModelTester:
 
         # Test saving path
         if config.saving:
-            test_path = join('test', config.saving_path.split('/')[-1])
+            test_path = join('test', os.path.basename(config.saving_path))
             if not exists(test_path):
                 makedirs(test_path)
             if not exists(join(test_path, 'predictions')):
@@ -259,7 +260,8 @@ class ModelTester:
                 lengths = batch.lengths[0].cpu().numpy()
                 in_inds = batch.input_inds.cpu().numpy()
                 cloud_inds = batch.cloud_inds.cpu().numpy()
-                torch.cuda.synchronize(self.device)
+                if torch.cuda.is_available():
+                    torch.cuda.synchronize(self.device)
 
                 # Get predictions and labels per instance
                 # ***************************************
@@ -424,7 +426,7 @@ class ModelTester:
                         preds = test_loader.dataset.label_values[np.argmax(proj_probs[i], axis=1)].astype(np.int32)
 
                         # Save plys
-                        cloud_name = file_path.split('/')[-1]
+                        cloud_name = os.path.basename(file_path)
                         test_name = join(test_path, 'predictions', cloud_name)
                         write_ply(test_name,
                                   [points, preds],
@@ -485,7 +487,7 @@ class ModelTester:
         test_path = None
         report_path = None
         if config.saving:
-            test_path = join('test', config.saving_path.split('/')[-1])
+            test_path = join('test', os.path.basename(config.saving_path))
             if not exists(test_path):
                 makedirs(test_path)
             report_path = join(test_path, 'reports')

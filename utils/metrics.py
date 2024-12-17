@@ -100,7 +100,7 @@ def fast_confusion(true, pred, label_values=None):
         if label_values[0] < 0:
             raise ValueError('Unsupported negative classes')
 
-        # Get the data in [0,num_classes[
+        # Get the data in [0,num_classes]
         label_map = np.zeros((label_values[-1] + 1,), dtype=np.int32)
         for k, v in enumerate(label_values):
             label_map[v] = k

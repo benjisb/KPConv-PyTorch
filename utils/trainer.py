@@ -195,13 +195,14 @@ class ModelTrainer:
                 loss.backward()
 
                 if config.grad_clip_norm > 0:
-                    #torch.nn.utils.clip_grad_norm_(net.parameters(), config.grad_clip_norm)
+                    # torch.nn.utils.clip_grad_norm_(net.parameters(), config.grad_clip_norm)
                     torch.nn.utils.clip_grad_value_(net.parameters(), config.grad_clip_norm)
                 self.optimizer.step()
 
                 
-                torch.cuda.empty_cache()
-                torch.cuda.synchronize(self.device)
+                if torch.cuda.is_available():
+                    torch.cuda.empty_cache()
+                    torch.cuda.synchronize(self.device)
 
                 t += [time.time()]
 
@@ -345,7 +346,8 @@ class ModelTrainer:
             probs += [softmax(outputs).cpu().detach().numpy()]
             targets += [batch.labels.cpu().numpy()]
             obj_inds += [batch.model_inds.cpu().numpy()]
-            torch.cuda.synchronize(self.device)
+            if torch.cuda.is_available():
+                torch.cuda.synchronize(self.device)
 
             # Average timing
             t += [time.time()]
@@ -486,7 +488,8 @@ class ModelTrainer:
             lengths = batch.lengths[0].cpu().numpy()
             in_inds = batch.input_inds.cpu().numpy()
             cloud_inds = batch.cloud_inds.cpu().numpy()
-            torch.cuda.synchronize(self.device)
+            if torch.cuda.is_available():
+                torch.cuda.synchronize(self.device)
 
             # Get predictions and labels per instance
             # ***************************************
@@ -589,7 +592,7 @@ class ModelTrainer:
                 files = val_loader.dataset.files
                 for i, file_path in enumerate(files):
                     pot_points = np.array(val_loader.dataset.pot_trees[i].data, copy=False)
-                    cloud_name = file_path.split('/')[-1]
+                    cloud_name = os.path.basename(file_path)[:-4]
                     pot_name = join(pot_path, cloud_name)
                     pots = val_loader.dataset.potentials[i].numpy().astype(np.float32)
                     write_ply(pot_name,
@@ -628,7 +631,7 @@ class ModelTrainer:
                 preds = (sub_preds[val_loader.dataset.test_proj[i]]).astype(np.int32)
 
                 # Path of saved validation file
-                cloud_name = file_path.split('/')[-1]
+                cloud_name = os.path.basename(file_path)[:-4]
                 val_name = join(val_path, cloud_name)
 
                 # Save file
@@ -719,7 +722,8 @@ class ModelTrainer:
             r_inds_list = batch.reproj_inds
             r_mask_list = batch.reproj_masks
             labels_list = batch.val_labels
-            torch.cuda.synchronize(self.device)
+            if torch.cuda.is_available():
+                torch.cuda.synchronize(self.device)
 
             # Get predictions and labels per instance
             # ***************************************
