@@ -98,7 +98,7 @@ if __name__ == '__main__':
     #       > 'last_XXX': Automatically retrieve the last trained model on dataset XXX
     #       > '(old_)results/Log_YYYY-MM-DD_HH-MM-SS': Directly provide the path of a trained model
 
-    chosen_log = 'results/Log_2024-12-10_00-57-14'
+    chosen_log = 'results/Log_2025-07-11_18-22-47'
 
     # Choose the index of the checkpoint to load OR None if you want to load the current checkpoint
     chkp_idx = None
@@ -149,7 +149,7 @@ if __name__ == '__main__':
     #config.batch_num = 3
     #config.in_radius = 4
     config.validation_size = 200
-    config.input_threads = 5
+    config.input_threads = 0
 
     ##############
     # Prepare Data
@@ -186,7 +186,8 @@ if __name__ == '__main__':
         test_sampler = SemanticKittiSampler(test_dataset)
         collate_fn = SemanticKittiCollate
     elif config.dataset == 'LAS':
-        test_dataset = LASDataset(config, set='validation', use_potentials=True)
+        test_dataset = LASDataset(config, set='validation', use_potentials=True,
+                                  path=r"C:\Users\BEBLADES\data\dales")
         test_sampler = LASSampler(test_dataset)
         collate_fn = LASCollate
     else:

@@ -87,7 +87,7 @@ class LASConfig(Config):
 
     # Radius of the area of influence of each kernel point in "number 
     # grid cell". (1.0 is the standard value)
-    KP_extent = 1.2
+    KP_extent = 1.0
 
     # Behavior of convolutions in {'constant', 'linear', 'gaussian'}
     KP_influence = "linear"
@@ -163,10 +163,15 @@ class LASConfig(Config):
     #              (points are weighted according cloud sizes)
     segloss_balance = "class"
     proportions = [
-        0.8574805792,
-        0.1422295855,
-        0.0002652218,
-        0.0000246135
+        0.0027994769115428930,
+        0.4853085634008541000,
+        0.2278763805571648300,
+        0.2593874626058474400,
+        0.0139410636161340900,
+        0.0008573298885012821,
+        0.0078811418361384950,
+        0.0012378267661264527,
+        0.0007107544176903813
     ]
     class_w = np.sqrt([1.0 / p for p in proportions])
 
@@ -249,8 +254,11 @@ if __name__ == "__main__":
         config.saving_path = sys.argv[1]
 
     # Initialize datasets
-    training_dataset = LASDataset(config, set="training", use_potentials=True)
-    test_dataset = LASDataset(config, set="validation", use_potentials=True)
+    datapath = r"C:\Users\BEBLADES\data\dales"
+    training_dataset = LASDataset(config, set="training", use_potentials=True,
+                                  path=datapath)
+    test_dataset = LASDataset(config, set="validation", use_potentials=True,
+                              path=datapath)
 
     # Initialize samplers
     training_sampler = LASSampler(training_dataset)

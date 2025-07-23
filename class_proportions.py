@@ -24,7 +24,7 @@ def class_proportions(
     return {c: counts[c] / total for c in counts.keys()}
 
 if __name__ == "__main__":
-    input_dir = r"Z:\LOUISE_ETHIER\from_Olena\data_for_KPConv\training_small"
-    ignored_classes = [7, 12]
+    input_dir = r"C:\Users\BEBLADES\data\dales\train"
+    ignored_classes = []
 
     print(class_proportions(input_dir, ignored_classes))

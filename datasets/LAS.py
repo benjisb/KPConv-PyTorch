@@ -24,19 +24,21 @@ class LASDataset(PointCloudDataset):
         super().__init__("LAS")
 
         self.label_to_names = {
-            0: "unknown",
+            1: "unknown",
             2: "ground",
-            7: "low noise",
-            12: "overlap",
-            18: "high noise",
-            23: "wire",
-            24: "pole"
+            5: "vegetation",
+            6: "building",
+            23: "car",
+            24: "pole",
+            25: "fence",
+            26: "powerline",
+            27: "truck"
         }
 
         self.init_labels()
 
         # classes to be ignored for training
-        self.ignored_labels = np.array([7, 12, 18])
+        self.ignored_labels = np.array([])
 
         # dataset directory
         self.path = path
@@ -58,14 +60,14 @@ class LASDataset(PointCloudDataset):
         self.use_potentials = use_potentials
 
         # Path of the training files
-        self.train_path = "classified_train"
-        self.valid_path = "classified_validation"
+        self.train_path = "train"
+        self.valid_path = "validate"
 
         # List of files to process
         train_las_path = os.path.join(self.path, self.train_path)
         valid_las_path = os.path.join(self.path, self.valid_path)
 
-        self.all_splits = [0, 0, 0, 0, 1]
+        self.all_splits = [0, 1]
         self.validation_split = 1
         
         # Number of models used per epoch
@@ -643,7 +645,7 @@ class LASDataset(PointCloudDataset):
                 with laspy.open(sub_las_file) as f:
                     data = f.read()
                     sub_intensity = data["intensity"]
-                    sub_labels = data["classification"].astype(np.int32)
+                    sub_labels = np.array(data["classification"], dtype=np.int32)
 
                 # Read pkl into search_tree
                 with open(KDTree_file, "rb") as f:
@@ -660,7 +662,7 @@ class LASDataset(PointCloudDataset):
                     intensity = data["intensity"]
                 # "unsqueeze" intensity
                 intensity = np.expand_dims(intensity, axis=1)
-                labels = data["classification"].astype(np.int32)
+                labels = np.array(data["classification"], dtype=np.int32)
 
                 # Subsample cloud
                 sub_points, sub_intensity, sub_labels = grid_subsampling(
@@ -779,7 +781,7 @@ class LASDataset(PointCloudDataset):
                     with laspy.open(file_path) as f:
                         data = f.read()
                         points = data.xyz
-                        labels = data["classification"].astype(np.int32)
+                        labels = np.array(data["classification"], dtype=np.int32)
 
                     # Compute projection inds
                     idxs = self.input_trees[i].query(points, 
