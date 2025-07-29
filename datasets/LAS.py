@@ -73,7 +73,7 @@ class LASDataset(PointCloudDataset):
         # Number of models used per epoch
         if self.set == "training":
             self.epoch_n = config.epoch_steps * config.batch_num
-        elif self.set == "validation":
+        elif self.set in ["validation", "test"]:
             self.epoch_n = config.validation_size * config.batch_num
         else:
             raise ValueError("Unkown set for LAS data: ", self.set)
